@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	binance_connector "github.com/binance/binance-connector-go"
+	binance_connector "github.com/zok2/binance-connector-go"
 )
 
 func main() {

@@ -846,3 +846,25 @@ func (c *WebsocketStreamClient) WsCombinedBookTickerServe(symbols []string, hand
 	}
 	return wsServe(cfg, wsHandler, errHandler)
 }
+
+// WsMarketTickerWindowStatEvent define array of websocket market mini-ticker statistics events
+type WsMarketTickerWindowStatEvent []*WsAllMarketTickersStatEvent
+
+// WsMarketTickerWindowStatHandler handle websocket that push single market statistics for 24hr
+type WsMarketTickerWindowStatHandler func(event WsAllMarketTickersStatEvent)
+
+// WsMarketTickerWindowStatServe serve websocket that push mini version of 24hr statistics for single market every second
+func (c *WebsocketStreamClient) WsMarketTickerWindowStatServe(window string, handler WsMarketTickerWindowStatHandler, errHandler ErrHandler) (doneCh, stopCh chan struct{}, err error) {
+	endpoint := fmt.Sprintf("%s/ticker_%s@arr", c.Endpoint, window)
+	cfg := newWsConfig(endpoint)
+	wsHandler := func(message []byte) {
+		var event WsAllMarketTickersStatEvent
+		err := json.Unmarshal(message, &event)
+		if err != nil {
+			errHandler(err)
+			return
+		}
+		handler(event)
+	}
+	return wsServe(cfg, wsHandler, errHandler)
+}
